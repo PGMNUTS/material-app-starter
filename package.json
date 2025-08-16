@@ -7,7 +7,7 @@
     "dev": "NODE_ENV=development node src/server.js",
     "start": "node src/server.js",
     "worker": "node src/workers/orderWorker.js",
-    "postinstall": "prisma generate && prisma migrate deploy"
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^5.18.0",
