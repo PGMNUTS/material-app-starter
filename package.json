@@ -1,0 +1,24 @@
+{
+  "name": "material-app-starter",
+  "version": "0.1.0",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "NODE_ENV=development node src/server.js",
+    "start": "node src/server.js",
+    "worker": "node src/workers/orderWorker.js",
+    "postinstall": "prisma generate && prisma migrate deploy"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.18.0",
+    "bullmq": "^5.8.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "ioredis": "^5.4.1",
+    "node-fetch": "^3.3.2",
+    "csv-parse": "^5.5.6"
+  },
+  "devDependencies": {
+    "prisma": "^5.18.0"
+  }
+}

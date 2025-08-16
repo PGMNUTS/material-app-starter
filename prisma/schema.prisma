@@ -1,0 +1,117 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Shop {
+  id            String   @id @default(cuid())
+  shopDomain    String   @unique
+  accessToken   String?
+  installedAt   DateTime @default(now())
+  uninstalledAt DateTime?
+  plan          String?
+  currentChargeId String?
+
+  variants       Variant[]
+  materials      Material[]
+  materialGroups MaterialGroup[]
+  stockLogs      StockLog[]
+  ordersRaw      OrderRaw[]
+}
+
+model MaterialGroup {
+  id        String   @id @default(cuid())
+  shopId    String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  shop      Shop     @relation(fields: [shopId], references: [id])
+  materials Material[]
+}
+
+model Material {
+  id           String   @id @default(cuid())
+  shopId       String
+  groupId      String
+  name         String
+  sku          String?
+  unitsPerSale Int      @default(1)
+  quantity     Int      @default(0)
+
+  shop         Shop          @relation(fields: [shopId], references: [id])
+  group        MaterialGroup @relation(fields: [groupId], references: [id])
+  mappings     VariantMaterialMap[]
+  stockLogs    StockLog[]
+}
+
+model Variant {
+  id              String  @id
+  shopId          String
+  productId       String
+  sku             String?
+  title           String
+  productTitle    String
+  inventoryItemId String
+
+  shop            Shop    @relation(fields: [shopId], references: [id])
+  mappings        VariantMaterialMap[]
+
+  @@index([shopId])
+}
+
+model VariantMaterialMap {
+  id           String  @id @default(cuid())
+  shopId       String
+  variantId    String
+  materialId   String
+  unitsPerSale Int     @default(1)
+  priority     Int     @default(1)
+
+  variant      Variant  @relation(fields: [variantId], references: [id])
+  material     Material @relation(fields: [materialId], references: [id])
+  shop         Shop     @relation(fields: [shopId], references: [id])
+
+  @@unique([shopId, variantId, materialId])
+}
+
+model OrderRaw {
+  id           String   @id @default(cuid())
+  shopId       String
+  orderId      String
+  action       String
+  variantId    String
+  lineItemId   String
+  qty          Int
+  payloadHash  String
+  status       String   @default("READY")
+  errorMessage String?
+  createdAt    DateTime @default(now())
+
+  shop         Shop     @relation(fields: [shopId], references: [id])
+
+  @@unique([shopId, orderId, action, variantId, lineItemId])
+}
+
+model StockLog {
+  id          String   @id @default(cuid())
+  shopId      String
+  materialId  String
+  source      String
+  reason      String?
+  qtyDelta    Int
+  who         String?
+  refOrderId  String?
+  refLineItem String?
+  createdAt   DateTime @default(now())
+
+  shop        Shop     @relation(fields: [shopId], references: [id])
+  material    Material @relation(fields: [materialId], references: [id])
+
+  @@index([shopId, createdAt])
+}
