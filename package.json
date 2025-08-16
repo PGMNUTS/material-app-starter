@@ -5,7 +5,7 @@
   "type": "commonjs",
   "scripts": {
     "dev": "NODE_ENV=development node src/server.js",
-    "start": "node src/server.js",
+    "start": "prisma db push && node src/server.js"
     "worker": "node src/workers/orderWorker.js",
     "postinstall": "prisma generate"
   },
